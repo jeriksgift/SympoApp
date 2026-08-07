@@ -1,5 +1,4 @@
 import { SignJWT, jwtVerify } from "jose";
-import { createHash } from "node:crypto";
 import {
   COOKIE_DOMAIN,
   SESSION_COOKIE,
@@ -76,6 +75,8 @@ export function sessionCookieOptions(isSecure?: boolean): CookieOptions {
 
 /** Codes are stored hashed; a database dump must not yield working codes. */
 export function hashCode(code: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createHash } = require("node:crypto");
   return createHash("sha256").update(normaliseCode(code)).digest("hex");
 }
 
@@ -94,5 +95,7 @@ export function normaliseAnswer(answer: string): string {
 
 /** Constant-time-ish compare for answer/flag hashes. */
 export function hashAnswer(answer: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { createHash } = require("node:crypto");
   return createHash("sha256").update(normaliseAnswer(answer)).digest("hex");
 }

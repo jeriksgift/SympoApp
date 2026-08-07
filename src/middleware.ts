@@ -6,9 +6,7 @@ import { verifySession } from "@/lib/auth/session";
  * Host-based routing for the five-subdomain platform, plus path-based routing
  * as a fallback.
  *
- * NOTE ON THE FILENAME: Next.js 16 deprecated `middleware.ts` in favour of
- * `proxy.ts` (and the named export `middleware` → `proxy`). Unlike middleware,
- * proxy runs on the **Node.js** runtime and that is not configurable.
+ * Runs on Edge Middleware, fully compatible with Cloudflare Workers / opennextjs-cloudflare.
  *
  *   hunt.example.com/clue/3  →  rewrite → /hunt/clue/3   → app/(hunt)/...
  *   ctf.example.com/         →  rewrite → /ctf           → app/(ctf)/...
@@ -22,7 +20,7 @@ import { verifySession } from "@/lib/auth/session";
  * must be gated on the path alone. `PROTECTED_PREFIXES` is what makes those
  * reachable-but-authenticated when `eventFromHost` returns null.
  *
- * AUTH HERE IS OPTIMISTIC ONLY. Per the Next docs, proxy shouldn't be treated
+ * AUTH HERE IS OPTIMISTIC ONLY. Per the Next docs, middleware shouldn't be treated
  * as the authorization boundary — it exists to bounce logged-out users to the
  * entry page cheaply. Every route handler that mutates state re-verifies the
  * session itself (see `requireSession`). Losing that second check would be a
@@ -101,7 +99,7 @@ function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // The admin login page itself must be reachable logged-out, or there is no
@@ -189,7 +187,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   /**
-   * Skip static assets outright — running proxy on every chunk request would
+   * Skip static assets outright — running middleware on every chunk request would
    * add latency to page loads for no benefit.
    */
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|ico|webp|woff2?)$).*)"],
