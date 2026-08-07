@@ -1,4 +1,13 @@
-import sharp from "sharp";
+function getSharp() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const s = require("sharp");
+    return s.default || s;
+  } catch {
+    return null;
+  }
+}
+
 import {
   compressRange,
   ditherFrames,
@@ -115,6 +124,11 @@ export async function buildServerDitheredFrames(
 
   const base64 = imageDataUrl.replace(/^data:[^,]+,/, "");
   const input = Buffer.from(base64, "base64");
+
+  const sharp = getSharp();
+  if (!sharp) {
+    return { frames: [imageDataUrl], width: 400, height: 400 };
+  }
 
   // Resize first so the watermark can be sized against the final dimensions.
   const resized = await sharp(input)

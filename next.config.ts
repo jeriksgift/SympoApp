@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
    */
   reactStrictMode: false,
   devIndicators: false,
-  serverExternalPackages: ["sharp"],
 };
 
 export default nextConfig;
