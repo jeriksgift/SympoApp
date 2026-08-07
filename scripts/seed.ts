@@ -7,9 +7,9 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { ObjectId } from "mongodb";
-
 // Load .env.local into process.env
 const envPath = resolve(process.cwd(), ".env.local");
+
 if (existsSync(envPath)) {
   const content = readFileSync(envPath, "utf8");
   for (const line of content.split("\n")) {
@@ -24,6 +24,7 @@ if (existsSync(envPath)) {
     }
   }
 }
+console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
 import { createHash } from "node:crypto";
 import { collections, ensureIndexes } from "../src/lib/db/client";
