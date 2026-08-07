@@ -11,8 +11,8 @@ export async function POST() {
   return res;
 }
 
-export async function GET() {
-  const res = NextResponse.redirect(new URL("/enter", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"));
+export async function GET(request: Request) {
+  const res = NextResponse.redirect(new URL("/enter", request.url));
   res.cookies.set({
     ...sessionCookieOptions(),
     value: "",

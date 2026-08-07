@@ -53,7 +53,7 @@ export default function QuizEntry() {
           if (target !== RT_REJECTED) {
             window.location.href = target;
           } else if (data.role === "admin") {
-            window.location.href = "/admin/quiz";
+            window.location.href = "/spider-hq-admin-9981/quiz";
           } else {
             window.location.href = postLoginPath();
           }
@@ -110,7 +110,7 @@ export default function QuizEntry() {
 
       setTimeout(() => {
         if (data.role === "admin") {
-          window.location.href = "/admin/quiz";
+          window.location.href = "/spider-hq-admin-9981/quiz";
         } else {
           window.location.href = postLoginPath();
         }
