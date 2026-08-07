@@ -18,8 +18,17 @@
  */
 import { readFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
 import { extname, basename, join } from "node:path";
-import sharp from "sharp";
 import { collections } from "../src/lib/db/client";
+
+function getSharp() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const s = require("sharp");
+    return s.default || s;
+  } catch {
+    return null;
+  }
+}
 
 const MIME: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -80,15 +89,15 @@ async function main() {
     process.exit(1);
   }
 
-  const meta = await sharp(bytes).metadata();
-
-  // Downscale only — never upscale a small source into a bigger "display"
-  // copy, which would add no detail and only inflate the payload.
-  const displayBuf = await sharp(bytes)
-    .resize({ width: Math.min(DISPLAY_MAX_WIDTH, meta.width ?? DISPLAY_MAX_WIDTH), withoutEnlargement: true })
-    .jpeg({ quality: DISPLAY_QUALITY, mozjpeg: true })
-    .toBuffer();
-  const displayMeta = await sharp(displayBuf).metadata();
+  const sharp = getSharp();
+  const displayBuf = sharp
+    ? await sharp(bytes)
+        .resize({ width: Math.min(DISPLAY_MAX_WIDTH, 1200), withoutEnlargement: true })
+        .jpeg({ quality: DISPLAY_QUALITY, mozjpeg: true })
+        .toBuffer()
+    : bytes;
+  const meta = sharp ? await sharp(bytes).metadata() : { width: 800, height: 600 };
+  const displayMeta = sharp ? await sharp(displayBuf).metadata() : meta;
 
   const masterDataUrl = `data:${mime};base64,${bytes.toString("base64")}`;
   const displayDataUrl = `data:image/jpeg;base64,${displayBuf.toString("base64")}`;

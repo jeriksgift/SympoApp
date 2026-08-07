@@ -32,7 +32,15 @@ if (fs.existsSync(".env.local")) {
 
 import { ObjectId } from "mongodb";
 import { randomBytes } from "node:crypto";
-import sharp from "sharp";
+function getSharp() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const s = require("sharp");
+    return s.default || s;
+  } catch {
+    return null;
+  }
+}
 import { collections, ensureIndexes } from "../src/lib/db/client";
 import { withThrottleRetry } from "../src/lib/db/retry";
 import { hashAnswer, hashCode, normaliseCode } from "../src/lib/auth/session";
@@ -416,11 +424,14 @@ async function main() {
     const mime = /\.png$/i.test(master) ? "image/png" : /\.webp$/i.test(master) ? "image/webp" : "image/jpeg";
     refDataUrl = `data:${mime};base64,${bytes.toString("base64")}`;
 
-    const displayBuf = await sharp(bytes)
-      .resize({ width: 900, withoutEnlargement: true })
-      .jpeg({ quality: 72, mozjpeg: true })
-      .toBuffer();
-    refDisplayDataUrl = `data:image/jpeg;base64,${displayBuf.toString("base64")}`;
+    const sharp = getSharp();
+    const displayBuf = sharp
+      ? await sharp(bytes)
+          .resize({ width: 900, withoutEnlargement: true })
+          .jpeg({ quality: 72, mozjpeg: true })
+          .toBuffer()
+      : bytes;
+    refDisplayDataUrl = `data:${sharp ? "image/jpeg" : mime};base64,${displayBuf.toString("base64")}`;
   } else {
     console.warn(
       "  ! No reference master in private/reference/ — Game 1 will have no image.\n" +

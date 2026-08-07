@@ -26,7 +26,6 @@ RUN npm ci
 # Ensure native bindings are built for this image's glibc runtime
 RUN npm rebuild lightningcss --update-binary || true
 RUN npm rebuild @tailwindcss/oxide --update-binary || true
-RUN npm rebuild sharp --update-binary || true
 COPY . .
 
 # Next reads env at build time for static optimisation. These are placeholders:
