@@ -99,6 +99,24 @@ export interface Challenge {
     nextSlug?: string;
     /** hunt: point cost of each hint, in order. */
     hintCosts?: number[];
+    /**
+     * hunt (octavius circuit): which of the server-side LEVELS this challenge
+     * is. Held here rather than taken from the submission so a team cannot
+     * solve level 1's circuit and be paid for level 5.
+     */
+    levelId?: number;
+    /**
+     * hunt: which sub-grader owns this round, for rounds that are not a hashed
+     * word answer.
+     *
+     * The hunt has grown rounds that grade in their own way — a circuit is
+     * rebuilt, a shiftverse slot is compared against the team's own word — but
+     * they are all hunt challenges and all go through gradeHunt. Naming the
+     * grader here rather than matching on the slug means renaming a round
+     * cannot silently route it back to the word check and mark every correct
+     * answer wrong.
+     */
+    flow?: "shiftverse" | "blueprint";
     /** quiz mcq: option index that scores. */
     correctIndex?: number;
     /** quiz mcq: seconds allowed from serve to answer (round 1 legacy path, unused by rounds 2/3). */
@@ -567,4 +585,22 @@ export interface QuizState {
   round2StartedAt?: Date | null;
   round3StartedAt?: Date | null;
   [key: string]: unknown;
+}
+
+export interface ShiftverseTeam {
+  _id?: ObjectId;
+  /** Puzzle slot 1..40. Identifies the WORD, never the caller. */
+  teamNumber: number;
+  /**
+   * Which team owns this slot. Null until claimed. This — not a URL segment —
+   * is what ties a puzzle to a player, so one team cannot read or overwrite
+   * another's board.
+   */
+  teamId: ObjectId | null;
+  claimedAt: Date | null;
+  plaintextWord: string;
+  encryptedWord: string;
+  shiftKey: number;
+  perLetterGuesses: number[];
+  startTime: number;
 }

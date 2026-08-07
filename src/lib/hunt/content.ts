@@ -6,7 +6,26 @@ import { CODES } from "./codes";
  * except through the seed and the shell — the reveal CODES must not reach the
  * browser inside a challenge document.
  */
-export const HUNT_SLUGS = ["hunt-cipher", "hunt-grid", "hunt-circuit", "hunt-room", "hunt-universe"] as const;
+export const HUNT_SLUGS = [
+  "hunt-cipher",
+  "hunt-grid",
+  "hunt-circuit",
+  "hunt-room",
+  "hunt-universe",
+  // The Octavius Circuit ships as five levels, each its own challenge so a team
+  // is paid per level and hunt_progress can gate them in order. "hunt-circuit"
+  // above is the old single-slug placeholder and stays seeded but unplayable.
+  "circuit-1",
+  "circuit-2",
+  "circuit-3",
+  "circuit-4",
+  "circuit-5",
+  // Shift-Verse: a hunt round, not its own event. See seed-shiftverse.ts.
+  "hunt-shiftverse",
+  // Blueprint Recovery: a physical-sector round. Also a hunt round rather than
+  // its own app — see scripts/seed-hunt.ts.
+  "hunt-blueprint",
+] as const;
 export type HuntSlug = (typeof HUNT_SLUGS)[number];
 
 /**
@@ -25,7 +44,7 @@ export type HuntSlug = (typeof HUNT_SLUGS)[number];
  * it cannot be imported here because it pulls in React components, and this
  * module is used by route handlers.
  */
-export const PLAYABLE_HUNT_SLUGS = ["hunt-universe", "hunt-room"] as const satisfies readonly HuntSlug[];
+export const PLAYABLE_HUNT_SLUGS = ["hunt-universe", "hunt-room", "circuit-1", "hunt-shiftverse", "hunt-blueprint"] as const satisfies readonly HuntSlug[];
 
 /**
  * Puzzles that live at their own route instead of rendering inside HuntShell.
@@ -38,6 +57,11 @@ export const PLAYABLE_HUNT_SLUGS = ["hunt-universe", "hunt-room"] as const satis
  */
 export const PUZZLE_HREFS: Partial<Record<HuntSlug, string>> = {
   "hunt-universe": "/universe",
+  // Shift-Verse is a three-page flow (landing, board, result) with its own
+  // layout, not a component that fits in a card next to an answer box.
+  "hunt-shiftverse": "/shiftverse",
+  // A briefing, a sector reveal and a code entry — a flow, not a card.
+  "hunt-blueprint": "/blueprint",
 };
 
 export const CIPHER = {
@@ -98,6 +122,34 @@ export const HINTS: Record<HuntSlug, [string, string]> = {
   "hunt-circuit": [
     "Work backwards from the sink, not forwards from the source.",
     "One tile in the middle column only ever needs a half turn.",
+  ],
+  "circuit-1": [
+    "Work backwards from the end node, not forwards from the source — only one route into it fits.",
+    "The inventory contains decoys. Count what the modifiers do to the source voltage before placing any of them.",
+  ],
+  "circuit-2": [
+    "The relay splits: a T-junction is doing work a corner cannot.",
+    "Add up every modifier on your route before you commit — overshooting the target is the usual mistake.",
+  ],
+  "circuit-3": [
+    "The x-blocks force one corridor. Find it first, then worry about voltage.",
+    "A decoy modifier that gets you to the target by the wrong route still fails — the end node has to be lit.",
+  ],
+  "circuit-4": [
+    "Containment means the circuit has to arrive at exactly the target, not below it.",
+    "If you are one off, you have used a decoy: check the sign on every modifier you placed.",
+  ],
+  "circuit-5": [
+    "Two modifiers cancel. Finding which pair saves you most of the board.",
+    "The core needs the full path lit — a circuit that hits the number but stops short of the end node scores nothing.",
+  ],
+  "hunt-shiftverse": [
+    "Every letter in the board shifted by the same amount. Find the shift on one letter you can guess and the rest follow.",
+    "The word is a Spider-Verse name. If the letters look close but wrong, you are one or two shifts out.",
+  ],
+  "hunt-blueprint": [
+    "The code is not on any screen. It is on a card at the sector you were assigned — if you are still looking at this page, you are looking in the wrong place.",
+    "Sectors are named by colour and dimension. Check you are at the one the reveal screen gave you and not a neighbour's.",
   ],
   "hunt-room": [
     "All five objects are somewhere in front of you — drag to look left and right, and check up on the walls as well as down near the floor.",

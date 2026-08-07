@@ -3,6 +3,9 @@ import { hashAnswer } from "@/lib/auth/session";
 import { collections } from "@/lib/db/client";
 import { isUniverseWord, universeIndexFor } from "@/lib/universe/words";
 import type { Challenge } from "@/lib/db/types";
+import { gradeCircuit } from "./circuit";
+import { gradeShiftverse } from "./shiftverse";
+import { gradeBlueprint } from "./blueprint";
 import type { GradeInput, GradeResult } from "./types";
 
 /** The universe round grades against the team's own universe, not a fixed hash. */
@@ -51,6 +54,26 @@ async function isCorrectAnswer(
  */
 export async function gradeHunt(input: GradeInput): Promise<GradeResult> {
   const { challenge, teamId, payload } = input;
+
+  // The circuit levels are hunt challenges but are not word answers: they are
+  // graded by rebuilding the player's board, so they get their own grader.
+  // Dispatched on the presence of a levelId rather than on a slug pattern, so
+  // renaming a level's slug cannot silently route it back to the word check.
+  if (typeof challenge.config.levelId === "number") {
+    return gradeCircuit(input);
+  }
+
+  // Shiftverse grades a guess against the team's own puzzle slot rather than a
+  // shared hash, and enforces its own fifteen-minute board deadline.
+  if (challenge.config.flow === "shiftverse") {
+    return gradeShiftverse(input);
+  }
+
+  // Blueprint Recovery checks a physical sector's access code against the
+  // sector this team was sent to, which is derived from their team number.
+  if (challenge.config.flow === "blueprint") {
+    return gradeBlueprint(input);
+  }
   const progress = await collections.huntProgress();
 
   const current = await progress.findOne({ teamId, challengeSlug: challenge.slug });
