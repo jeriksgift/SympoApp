@@ -1,10 +1,10 @@
 {
-  "name": "xplore26-events",
+  "name": "multiversebreach",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "opennextjs-cloudflare build",
-    "build:next": "next build",
+    "build": "next build",
+    "build:cf": "opennextjs-cloudflare build",
     "dev": "next dev",
     "start": "next start",
     "lint": "eslint",
@@ -56,7 +56,6 @@
     "@next/swc-linux-x64-gnu": "16.2.11",
     "@rollup/rollup-linux-x64-gnu": "^4.0.0",
     "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
-    "lightningcss-linux-x64-gnu": "1.32.0",
-    "sharp": "^0.34.5"
+    "lightningcss-linux-x64-gnu": "1.32.0"
   }
 }
