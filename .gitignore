@@ -60,3 +60,11 @@ private/reference/*
 # GitHub, and 40 plaintext answers pushed there are 40 solved puzzles. Carry
 # the real file to the event machine out of band.
 private/shiftverse/words.json
+
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
