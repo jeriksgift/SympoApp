@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 import { requireSession, UnauthorizedError } from "@/lib/auth/guard";
 import { recordArrival } from "@/lib/event/participation";
 import { collections, getDb } from "@/lib/db/client";
@@ -49,7 +50,7 @@ export async function GET() {
     const subsCollection = await collections.submissionsCtf();
     const challengesCollection = await collections.challengesCtf();
 
-    const team = await teams.findOne({ _id: new (require("mongodb").ObjectId)(teamIdStr) });
+    const team = await teams.findOne({ _id: new ObjectId(teamIdStr) });
     if (session.role !== "admin" && !team) {
       return NextResponse.json({ error: "Session expired or team no longer exists" }, { status: 401 });
     }
@@ -79,7 +80,7 @@ export async function GET() {
 
     // Get team's own submissions
     const teamSubs = await subsCollection
-      .find({ teamId: new (require("mongodb").ObjectId)(teamIdStr) })
+      .find({ teamId: new ObjectId(teamIdStr) })
       .sort({ receivedAt: -1 })
       .toArray();
 
