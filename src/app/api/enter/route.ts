@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE, eventFromHost } from "@/lib/config";
+import { SESSION_COOKIE, eventFromHost, EVENTS, type EventKey } from "@/lib/config";
 import { timingSafeEqual, createHash } from "node:crypto";
 import { collections } from "@/lib/db/client";
 import { hashCode, normaliseCode, signSession, sessionCookieOptions } from "@/lib/auth/session";
