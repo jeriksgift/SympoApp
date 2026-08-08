@@ -69,11 +69,10 @@ export async function materialize(event: EventKey | "overall"): Promise<Leaderbo
     ]);
     const ctfTeamIds = new Set([...submittedIds, ...scoredIds].map((id) => String(id)));
 
-    // Initialize non-banned teams (excluding Admin Team) with initial penalty deductions if any
+    // Initialize all non-banned teams (excluding Admin Team) with initial penalty deductions if any
     for (const t of teamDocs) {
       const tid = String(t._id);
       if (bannedTeamIds.has(tid)) continue;
-      if (!ctfTeamIds.has(tid)) continue;
       teamStats.set(tid, {
         teamId: tid,
         points: -(t.penaltyPoints ?? 0),

@@ -60,6 +60,7 @@ const EVENT_COPY: Record<string, { tagline: string; prompt: string }> = {
 };
 
 export default function PlatformEntry({ event }: { event: EventKey | null }) {
+  const activeEvent = event || "ctf";
   const [teamName, setTeamName] = useState("");
   const [partPassword, setPartPassword] = useState("");
   const [showPartPassword, setShowPartPassword] = useState(false);
@@ -80,7 +81,7 @@ export default function PlatformEntry({ event }: { event: EventKey | null }) {
       const res = await fetch("/api/enter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamName: teamName.trim(), password: partPassword }),
+        body: JSON.stringify({ teamName: teamName.trim(), password: partPassword, event: activeEvent }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -139,7 +140,7 @@ export default function PlatformEntry({ event }: { event: EventKey | null }) {
           <span className="text-red-600">MULTIVERSE BREACH</span>
         </h1>
         <p className="text-gray-400 text-xs md:text-sm mt-2 font-medium tracking-wide">
-          {EVENT_COPY[event ?? "default"].tagline}
+          {EVENT_COPY.ctf.tagline}
         </p>
       </div>
 
@@ -150,7 +151,7 @@ export default function PlatformEntry({ event }: { event: EventKey | null }) {
             Participant Portal
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-medium">
-            {EVENT_COPY[event ?? "default"].prompt}
+            {EVENT_COPY.ctf.prompt}
           </p>
         </div>
 

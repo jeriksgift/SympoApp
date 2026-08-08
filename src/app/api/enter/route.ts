@@ -105,7 +105,23 @@ async function platformEntry(
    * so this only affects local runs, and getting it right there needs a signal
    * the request does not carry.
    */
-  const event = eventFromHost(request.headers.get("host"));
+  let event: EventKey | null = null;
+  if (typeof body.event === "string" && (EVENTS as readonly string[]).includes(body.event)) {
+    event = body.event as EventKey;
+  }
+  if (!event) {
+    event = eventFromHost(request.headers.get("host"));
+  }
+  if (!event) {
+    const referer = request.headers.get("referer") || "";
+    if (referer.includes("/ctf")) event = "ctf";
+    else if (referer.includes("/quiz")) event = "quiz";
+    else if (referer.includes("/hunt")) event = "hunt";
+    else if (referer.includes("/code")) event = "code";
+  }
+  if (!event) {
+    event = "ctf";
+  }
   const isCtf = event === "ctf";
   const teamsFor = () => (isCtf ? collections.teamsCtf() : collections.teams());
   const participantsFor = () =>

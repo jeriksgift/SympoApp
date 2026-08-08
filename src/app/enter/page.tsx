@@ -1,34 +1,30 @@
 import { headers } from "next/headers";
-import { eventFromHost } from "@/lib/config";
+import { eventFromHost, type EventKey } from "@/lib/config";
 import QuizEntry from "./QuizEntry";
 import PlatformEntry from "./PlatformEntry";
 
 /**
- * The login screen, picked by host — the UI counterpart to the dispatch in
+ * The login screen, picked by host/path — the UI counterpart to the dispatch in
  * `api/enter/route.ts`.
  *
- * The quiz asks for a coin number and shows the avatar it unlocks; the CTF and
- * hunt ask for a team name and password. Those are different forms posting
- * different bodies, so the page that renders them has to know which event the
- * visitor is on. `/enter` is in the proxy's PUBLIC_PREFIXES and is therefore
- * never rewritten into a route group, which is why this reads the Host header
- * itself rather than relying on the `x-event` header the proxy sets on
- * rewritten requests.
- *
- * This is a server component purely so it can read that header; both branches
- * below are the original client components, moved but not rewritten.
+ * Defaults to the "ctf" event on path-based single domain deployments.
  */
-export default async function EnterPage() {
+export default async function EnterPage({ searchParams }: { searchParams?: Promise<{ rt?: string }> }) {
   const host = (await headers()).get("host");
-  const event = eventFromHost(host);
+  const params = await searchParams;
+  const rt = params?.rt;
 
-  // Path-based deployments (localhost, ngrok) have no subdomain to read. The
-  // platform form is the safe default there: it is the only one that can also
-  // redeem a plain access code.
-  //
-  // `event` goes down with it so the form can name the event the participant is
-  // actually on. It called itself the CTF arena on every host, which is what
-  // "the hunt shows the CTF page" was reporting — the login worked and led to
-  // the hunt, but said otherwise on the way in.
+  let event: EventKey | null = eventFromHost(host);
+  if (!event && rt) {
+    if (rt.includes("/ctf")) event = "ctf";
+    else if (rt.includes("/quiz")) event = "quiz";
+    else if (rt.includes("/hunt")) event = "hunt";
+    else if (rt.includes("/code")) event = "code";
+  }
+  // Default for single domain deployment (multiversebreach.jeriksgift.workers.dev)
+  if (!event) {
+    event = "ctf";
+  }
+
   return event === "quiz" ? <QuizEntry /> : <PlatformEntry event={event} />;
 }

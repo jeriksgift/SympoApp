@@ -128,7 +128,7 @@ function clientPromise(): Promise<MongoClient> {
 
 export async function getDb(): Promise<Db> {
   const client = await clientPromise();
-  return client.db(process.env.MONGODB_DB ?? "xplore26");
+  return client.db(process.env.MONGODB_DB ?? "ctf-xplore-26");
 }
 
 /** Typed collection accessors — one place that knows the collection names. */
